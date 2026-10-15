@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>寻宝游戏</title>
+    <style>
+        body{
+            background:#1a1a2e;
+            color:#fff;
+            font-size:20px;
+            padding:40px;
+            font-family:微软雅黑;
+        }
+        #gameBox{
+            max-width:700px;
+        }
+        .text-item{
+            margin:15px 0;
+            opacity:0;
+            transform: translateY(10px);
+            animation: showText 0.8s forwards;
+        }
+        @keyframes showText{
+            to{
+                opacity:1;
+                transform: translateY(0);
+            }
+        }
+        .fail{
+            color:#ff6b6b;
+        }
+        .success{
+            color:#4cd964;
+        }
+        /* 重新开始按钮样式 */
+        #restartBtn{
+            padding:10px 24px;
+            font-size:18px;
+            background:#3474eb;
+            color:white;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            margin-bottom:20px;
+        }
+        #restartBtn:hover{
+            background:#235fc9;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameBox">
+        <h2>🏺 寻宝冒险游戏</h2>
+        <!-- 新增重新开始按钮 -->
+        <button id="restartBtn">🔄 重新开始游戏</button>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        // 和之前一样的宝藏地图类
+        class TreasureMap {
+            static getInitialClue() {
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve("在古老的图书馆里找到了第一个线索...");
+                }, 1000);
+              });
+            }
+          
+            static decodeAncientScript(clue) {
+              return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  if (!clue) {
+                    reject("没有线索可以解码!");
+                  }
+                  resolve("解码成功!宝藏在一座古老的神庙中，需要穿过幽暗山洞...");
+                }, 1500);
+              });
+            }
+      
+            static solveCavePuzzle(location) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if(random < 0.4){
+                            reject("谜题答错！山洞石门关闭，被困在山洞中，寻宝失败！");
+                        }
+                        resolve("石门谜题解开！成功穿过山洞，前方就是神庙！");
+                    },1800)
+                })
+            }
+          
+            static searchTemple(location) {
+              return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  const random = Math.random();
+                  if (random < 0.5) {
+                    reject("糟糕!遇到了神庙守卫!");
+                  }
+                  resolve("找到了一个神秘的箱子...");
+                }, 2000);
+              });
+            }
+          
+            static openTreasureBox() {
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve("恭喜!你找到了传说中的宝藏!");
+                }, 1000);
+              });
+            }
+          }
+
+        // 在页面上添加一行文字
+        function addLog(text, type="normal"){
+            const logDiv = document.getElementById('log');
+            const div = document.createElement('div');
+            div.className = "text-item " + type;
+            div.innerText = text;
+            logDiv.appendChild(div);
+        }
+
+        // async/await 网页版寻宝
+        async function startGame() {
+            try {
+                const clue = await TreasureMap.getInitialClue();
+                addLog(clue);
+        
+                const location = await TreasureMap.decodeAncientScript(clue);
+                addLog(location);
+        
+                const caveResult = await TreasureMap.solveCavePuzzle(location);
+                addLog(caveResult);
+        
+                const box = await TreasureMap.searchTemple(location);
+                addLog(box);
+        
+                const treasure = await TreasureMap.openTreasureBox();
+                addLog(treasure, "success");
+              } catch (error) {
+                addLog("任务失败：" + error, "fail");
+              }
+        }
+
+        // 绑定重新开始按钮事件
+        const restartBtn = document.getElementById("restartBtn");
+        restartBtn.addEventListener("click", function(){
+            // 清空所有剧情文字
+            document.getElementById("log").innerHTML = "";
+            // 重新执行游戏
+            startGame();
+        })
+
+        // 页面加载自动启动游戏
+        startGame();
+    </script>
+</body>
+</html>
